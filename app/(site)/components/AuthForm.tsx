@@ -1,7 +1,10 @@
 'use client';
 import React, { useCallback, useState } from 'react';
+import { signIn } from 'next-auth/react';
+import axios from 'axios';
 import { FieldValues, useForm, SubmitHandler } from 'react-hook-form';
 import { BsGithub, BsGoogle } from 'react-icons/bs';
+import { toast } from 'react-hot-toast';
 
 import Button from '@/app/components/Button';
 import Input from '@/app/components/input/Input';
@@ -39,18 +42,46 @@ const AuthForm = () => {
     setIsLoading(true);
 
     if (varian === 'REGISTER') {
-      // Axios POST /api/auth/register
+      axios
+        .post('/api/register', data)
+        .catch(err => toast.error('Something went wrong!'))
+        .finally(() => setIsLoading(false));
     }
 
     if (varian === 'LOGIN') {
-      // Axios POST /api/auth/login
+      signIn('credentials', {
+        ...data,
+        redirect: false,
+      })
+        .then(callback => {
+          if (callback?.error) {
+            toast.error('Invalid credentials!');
+          }
+
+          if (callback?.ok && !callback?.error) {
+            toast.success('Login success!');
+          }
+        })
+        .finally(() => setIsLoading(false));
     }
   };
 
   const socialAction = (action: string) => {
     setIsLoading(true);
 
-    // NextAuth social login
+    signIn(action, {
+      redirect: false,
+    })
+      .then(callback => {
+        if (callback?.error) {
+          toast.error('Invalid credentials!');
+        }
+
+        if (callback?.ok && !callback?.error) {
+          toast.success('Login success!');
+        }
+      })
+      .finally(() => setIsLoading(false));
   };
 
   return (
@@ -60,24 +91,27 @@ const AuthForm = () => {
           {varian === 'REGISTER' && (
             <Input
               label='name'
-              id='Name'
+              id='name'
               register={register}
               errors={errors}
+              disabled={isLoading}
             />
           )}
           <Input
             label='email'
-            id='Email address'
+            id='email'
             type='email'
             register={register}
             errors={errors}
+            disabled={isLoading}
           />
           <Input
             label='password'
-            id='Password'
+            id='password'
             type='password'
             register={register}
             errors={errors}
+            disabled={isLoading}
           />
           <div>
             <Button disabled={isLoading} fullWidth type='submit'>
