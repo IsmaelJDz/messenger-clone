@@ -1,36 +1,36 @@
-'use client';
-import React, { useCallback, useEffect, useState } from 'react';
-import { signIn, useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
-import axios from 'axios';
-import { FieldValues, useForm, SubmitHandler } from 'react-hook-form';
-import { BsGithub, BsGoogle } from 'react-icons/bs';
-import { toast } from 'react-hot-toast';
+"use client";
+import React, { useCallback, useEffect, useState } from "react";
+import { signIn, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import axios from "axios";
+import { FieldValues, useForm, SubmitHandler } from "react-hook-form";
+import { BsGithub, BsGoogle } from "react-icons/bs";
+import { toast } from "react-hot-toast";
 
-import Button from '@/app/components/Button';
-import Input from '@/app/components/input/Input';
-import AuthSocialButton from './AuthSocialButton';
+import Button from "@/app/components/Button";
+import Input from "@/app/components/input/Input";
+import AuthSocialButton from "./AuthSocialButton";
 
-type Varian = 'LOGIN' | 'REGISTER';
+type Varian = "LOGIN" | "REGISTER";
 
 const AuthForm = () => {
   const session = useSession();
   const router = useRouter();
 
-  const [varian, setVarian] = useState<Varian>('LOGIN');
+  const [varian, setVarian] = useState<Varian>("LOGIN");
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (session?.status === 'authenticated') {
-      router.push('/users');
+    if (session?.status === "authenticated") {
+      router.push("/conversations");
     }
   }, [session?.status, router]);
 
   const toggleVarian = useCallback(() => {
-    if (varian === 'LOGIN') {
-      setVarian('REGISTER');
+    if (varian === "LOGIN") {
+      setVarian("REGISTER");
     } else {
-      setVarian('LOGIN');
+      setVarian("LOGIN");
     }
   }, [varian]);
 
@@ -40,9 +40,9 @@ const AuthForm = () => {
     formState: { errors },
   } = useForm<FieldValues>({
     defaultValues: {
-      name: '',
-      email: '',
-      password: '',
+      name: "",
+      email: "",
+      password: "",
     },
   });
 
@@ -51,27 +51,42 @@ const AuthForm = () => {
   ) => {
     setIsLoading(true);
 
-    if (varian === 'REGISTER') {
+    if (varian === "REGISTER") {
       axios
-        .post('/api/register', data)
-        .then(callback => () => signIn('credentials', { ...data }))
-        .catch(err => toast.error('Something went wrong!'))
+        .post("/api/register", data)
+        .then(() =>
+          signIn("credentials", {
+            ...data,
+            redirect: false,
+          })
+        )
+        .then(callback => {
+          if (callback?.error) {
+            toast.error("Invalid credentials!");
+          }
+
+          if (callback?.ok && !callback?.error) {
+            toast.success("Login success!");
+            router.push("/users");
+          }
+        })
+        .catch(err => toast.error("Something went wrong!"))
         .finally(() => setIsLoading(false));
     }
 
-    if (varian === 'LOGIN') {
-      signIn('credentials', {
+    if (varian === "LOGIN") {
+      signIn("credentials", {
         ...data,
         redirect: false,
       })
         .then(callback => {
           if (callback?.error) {
-            toast.error('Invalid credentials!');
+            toast.error("Invalid credentials!");
           }
 
           if (callback?.ok && !callback?.error) {
-            toast.success('Login success!');
-            router.push('/users');
+            toast.success("Login success!");
+            router.push("/users");
           }
         })
         .finally(() => setIsLoading(false));
@@ -86,11 +101,11 @@ const AuthForm = () => {
     })
       .then(callback => {
         if (callback?.error) {
-          toast.error('Invalid credentials!');
+          toast.error("Invalid credentials!");
         }
 
         if (callback?.ok && !callback?.error) {
-          toast.success('Login success!');
+          toast.success("Login success!");
         }
       })
       .finally(() => setIsLoading(false));
@@ -100,7 +115,7 @@ const AuthForm = () => {
     <div className='mt-8 sm:mx-auto sm:w-full sm:max-w-md'>
       <div className='px-4 py-8 bg-white shadow sm:rounded-lg sm:px-10'>
         <form className='space-y-6' onSubmit={handleSubmit(onSubmit)}>
-          {varian === 'REGISTER' && (
+          {varian === "REGISTER" && (
             <Input
               label='name'
               id='name'
@@ -127,7 +142,7 @@ const AuthForm = () => {
           />
           <div>
             <Button disabled={isLoading} fullWidth type='submit'>
-              {varian === 'LOGIN' ? 'Sign in' : 'Register'}
+              {varian === "LOGIN" ? "Sign in" : "Register"}
             </Button>
           </div>
         </form>
@@ -147,26 +162,26 @@ const AuthForm = () => {
           <div className='flex gap-2 mt-6 '>
             <AuthSocialButton
               icon={BsGithub}
-              onClick={() => socialAction('github')}
+              onClick={() => socialAction("github")}
             />
 
             <AuthSocialButton
               icon={BsGoogle}
-              onClick={() => socialAction('google')}
+              onClick={() => socialAction("google")}
             />
           </div>
         </div>
 
         <div className='flex justify-center gap-2 px-2 mt-6 text-sm text-gray-500'>
           <div>
-            {varian === 'LOGIN'
-              ? 'New to Messenger?'
-              : 'Already have an account?'}
+            {varian === "LOGIN"
+              ? "New to Messenger?"
+              : "Already have an account?"}
           </div>
           <div
             onClick={toggleVarian}
             className='underline cursor-pointer'>
-            {varian === 'LOGIN' ? 'Create an account' : 'Login'}
+            {varian === "LOGIN" ? "Create an account" : "Login"}
           </div>
         </div>
       </div>
