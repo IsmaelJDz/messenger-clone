@@ -59,8 +59,6 @@ const SettingsModal: React.FC<ISettingsModalProps> = ({
       .finally(() => setIsLoading(false));
   };
 
-  console.log(currentUser);
-
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <form onSubmit={handleSubmit(onSubmit)}>

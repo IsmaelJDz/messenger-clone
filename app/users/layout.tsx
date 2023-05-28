@@ -10,8 +10,6 @@ export default async function UsersLayout({
 }) {
   const users = await getUser();
 
-  console.log(users);
-
   return (
     // @ts-expect-error Server Component
     <Sidebar>
