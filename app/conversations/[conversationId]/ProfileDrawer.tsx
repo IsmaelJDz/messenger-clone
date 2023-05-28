@@ -7,7 +7,8 @@ import useOtherUser from "@/app/hooks/useOtherUser";
 import { IoClose, IoTrash } from "react-icons/io5";
 import { Dialog, Transition } from "@headlessui/react";
 import Avatar from "@/app/components/Avatar";
-import Modal from "@/app/components/Modal";
+import ConfirmModal from "./ConfirmModal";
+import AvatarGroup from "@/app/components/AvatarGroup";
 
 interface IProfileDrawerProps {
   data: Conversation & {
@@ -23,7 +24,7 @@ const ProfileDrawer: React.FC<IProfileDrawerProps> = ({
   onClose,
 }) => {
   const otherUsers = useOtherUser(data);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const joinedDate = useMemo(() => {
     return format(new Date(otherUsers?.createdAt), "PP");
@@ -43,13 +44,10 @@ const ProfileDrawer: React.FC<IProfileDrawerProps> = ({
 
   return (
     <>
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}>
-        <div className='p-5 bg-white'>
-          <p>Hello Modal!</p>
-        </div>
-      </Modal>
+      <ConfirmModal
+        isOpen={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+      />
       <Transition.Root show={isOpen} as={Fragment}>
         <Dialog as='div' className='relative z-50' onClose={onClose}>
           <Transition.Child
@@ -93,7 +91,11 @@ const ProfileDrawer: React.FC<IProfileDrawerProps> = ({
                       <div className='relative flex-1 px-4 mt-6 sm:px-6'>
                         <div className='flex flex-col items-center'>
                           <div className='mb-2'>
-                            <Avatar currentUser={otherUsers} />
+                            {data.isGroup ? (
+                              <AvatarGroup users={data.users} />
+                            ) : (
+                              <Avatar currentUser={otherUsers} />
+                            )}
                           </div>
                           <div>{title}</div>
                           <div className='text-sm text-gray-500'>
@@ -101,7 +103,7 @@ const ProfileDrawer: React.FC<IProfileDrawerProps> = ({
                           </div>
                           <div className='flex gap-10 my-8'>
                             <div
-                              onClick={() => setIsModalOpen(true)}
+                              onClick={() => setConfirmOpen(true)}
                               className='flex flex-col items-center gap-3 cursor-pointer hover:opacity-75'>
                               <div className='flex items-center justify-center w-10 h-10 rounded-full bg-neutral-100'>
                                 <IoTrash size={24} />
@@ -113,6 +115,18 @@ const ProfileDrawer: React.FC<IProfileDrawerProps> = ({
                           </div>
                           <div className='w-full pt-5 pb-5 sm:px-0 sm:pt-0'>
                             <dl className='px-4 space-y-8 sm:space-y-6 sm:px-6'>
+                              {data.isGroup && (
+                                <div>
+                                  <dt className='text-sm font-medium text-gray-500 sm:w-40 sm:flex-shrink-0'>
+                                    Emails
+                                  </dt>
+                                  <dd className='mt-1 text-sm text-gray-900 sm:col-span-2'>
+                                    {data.users
+                                      .map(user => user.email)
+                                      .join(", ")}
+                                  </dd>
+                                </div>
+                              )}
                               {!data.isGroup && (
                                 <div>
                                   <dt className='text-sm font-medium text-gray-500 sm:w-40 sm:flex-shrink-0'>

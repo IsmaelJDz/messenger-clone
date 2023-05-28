@@ -3,10 +3,11 @@
 import React, { useMemo, useState } from "react";
 import Link from "next/link";
 import { Conversation, User } from "@prisma/client";
+import { HiEllipsisHorizontal } from "react-icons/hi2";
 import useOtherUser from "@/app/hooks/useOtherUser";
 import { HiChevronLeft } from "react-icons/hi";
 import Avatar from "@/app/components/Avatar";
-import { HiEllipsisHorizontal } from "react-icons/hi2";
+import AvatarGroup from "@/app/components/AvatarGroup";
 import ProfileDrawer from "./ProfileDrawer";
 
 interface IHeaderProps {
@@ -54,7 +55,13 @@ const Header: React.FC<IHeaderProps> = ({ conversation }) => {
             href='/conversation'>
             <HiChevronLeft size={32} />
           </Link>
-          <Avatar currentUser={otherUsers} />
+
+          {conversation?.isGroup ? (
+            <AvatarGroup users={conversation?.users} />
+          ) : (
+            <Avatar currentUser={otherUsers} />
+          )}
+
           <div className='flex flex-col '>
             <div>{conversation?.name || otherUsers?.name}</div>
             <div className='text-sm font-light text-neutral-500'>
