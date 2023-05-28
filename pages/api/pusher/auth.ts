@@ -5,17 +5,21 @@ import { pusherServer } from "@/app/libs/pusher";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
+  request: NextApiRequest,
+  response: NextApiResponse
 ) {
-  const session = await getServerSession(req, res, authOptions);
+  const session = await getServerSession(
+    request,
+    response,
+    authOptions
+  );
 
   if (!session?.user?.email) {
-    return res.status(401).json({ error: "Unauthorized" });
+    return response.status(401);
   }
 
-  const socketId = req.body.socket_id;
-  const channel = req.body.channel_name;
+  const socketId = request.body.socket_id;
+  const channel = request.body.channel_name;
   const data = {
     user_id: session.user.email,
   };
@@ -25,6 +29,5 @@ export default async function handler(
     channel,
     data
   );
-
-  return res.send(authResponse);
+  return response.send(authResponse);
 }

@@ -28,3 +28,5 @@ export default function RootLayout({
     </html>
   );
 }
+
+//TODO: avoid fix flash initial page

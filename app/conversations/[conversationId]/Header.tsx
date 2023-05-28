@@ -56,7 +56,7 @@ const Header: React.FC<IHeaderProps> = ({ conversation }) => {
         <div className='flex items-center gap-3 '>
           <Link
             className='block transition cursor-pointer lg:hidden text-sky-500 hover:text-sky-600'
-            href='/conversation'>
+            href='/conversations'>
             <HiChevronLeft size={32} />
           </Link>
 
